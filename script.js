@@ -1,6 +1,6 @@
 const allowedLat = 30.4165013;
 const allowedLng = 77.9671812;
-const radiusMeters = 5000;
+const radiusMeters = 100;
 
 const form = document.getElementById('register-form');
 const markBtn = document.getElementById('mark-btn');
@@ -39,68 +39,57 @@ markBtn?.addEventListener('click', () => {
   function success(position) {
     const lat = position.coords.latitude;
     const lng = position.coords.longitude;
-
-    const distance = getDistanceFromLatLonInMeters(lat, lng,allowedLat,allowedLng);
-    console.log(distance);
-    console.log(radiusMeters);
+    console.log("Latitude:", lat, "Longitude:", lng);
+    
+    const distance = getDistanceFromLatLonInMeters(lat, lng, allowedLat, allowedLng);
+    console.log("Distance:", distance);
+    console.log("Allowed radius:", radiusMeters);
 
     if (distance <= radiusMeters) {
       status.innerText = "✅ Inside location. Marking attendance...";
       sendAttendance(user.name, user.email, user.phone, lat, lng);
-      console.log("yhanpaunch gye");
     } else {
-        console.log("yhan bhi paunch gye");
-      status.innerText = "❌❌ You are not within the allowed area.";
-      
+      status.innerText = "❌ You are not within the allowed area.";
     }
   }
 });
 
 function getDistanceFromLatLonInMeters(lat1, lon1, lat2, lon2) {
-  const R = 6371e3;
-  const φ1 = lat1 * Math.PI/180;
-  const φ2 = lat2 * Math.PI/180;
-  const Δφ = (lat2 - lat1) * Math.PI/180;
-  const Δλ = (lon2 - lon1) * Math.PI/180;
-  const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+  const R = 6371e3; // Earth radius in meters
+  const φ1 = lat1 * Math.PI / 180;
+  const φ2 = lat2 * Math.PI / 180;
+  const Δφ = (lat2 - lat1) * Math.PI / 180;
+  const Δλ = (lon2 - lon1) * Math.PI / 180;
+
+  const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
             Math.cos(φ1) * Math.cos(φ2) *
-            Math.sin(Δλ/2) * Math.sin(Δλ/2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
   return R * c;
 }
 
-// function sendAttendance(name, email, phone, lat, lng) {
-// //   const scriptURL = 'YOUR_GOOGLE_APPS_SCRIPT_WEBHOOK_URL';
-//   const scriptURL = 'https://script.google.com/macros/s/AKfycbwqNfX8-oZwuHvhcQL33ZIU-E-5DPkCtJ6z1tZ85haOmVwvF9gHOYnGd7GSK984tSlF/exec';
-//   fetch(scriptURL, {
-//     method: 'POST',
-//     body: JSON.stringify({ name, email, phone, lat, lng }),
-//     headers: { 'Content-Type': 'application/json' },
-//   })
-//   .then(() => {
-//     status.innerText = "✅ Attendance marked successfully!";
-//   })
-//   .catch(() => {
-//     status.innerText = "❌ Failed to mark attendance.";
-//   });
-
-
 function sendAttendance(name, email, phone, lat, lng) {
-  const scriptURL = 'https://script.google.com/macros/s/AKfycbwqNfX8-oZwuHvhcQL33ZIU-E-5DPkCtJ6z1tZ85haOmVwvF9gHOYnGd7GSK984tSlF/exec'
-  const formData = new FormData();
-  formData.append('name', name);
-  formData.append('email', email);
-  formData.append('phone', phone);
-  formData.append('lat', lat);
-  formData.append('lng', lng);
+//   const baseURL = 'https://script.google.com/macros/s/AKfycbwqNfX8-oZwuHvhcQL33ZIU-E-5DPkCtJ6z1tZ85haOmVwvF9gHOYnGd7GSK984tSlF/exec';
+  const baseURL = "https://script.google.com/macros/s/AKfycbxh0UG0FU0d0_sBVL6lSywscSgMREaTeSptgwQGXI5jbTMzHSIfMG2FQzD3dCzbqmEx/exec";
 
-  fetch(scriptURL, {
-    method: 'POST',
-    body: formData
+
+  const params = new URLSearchParams({
+    name: name,
+    email: email,
+    phone: phone,
+    lat: lat,
+    lng: lng
+  });
+
+  const urlWithParams = `${baseURL}?${params.toString()}`;
+
+  fetch(urlWithParams, {
+    method: 'GET',
+    mode: 'no-cors'
   })
-  .then(response => response.text())
-  .then(result => {
-    console.log("✅ Attendance marked:", result);
+  .then(() => {
     document.getElementById("status").innerText = "✅ Attendance marked successfully!";
   })
   .catch(error => {
@@ -108,9 +97,3 @@ function sendAttendance(name, email, phone, lat, lng) {
     document.getElementById("status").innerText = "❌ Failed to mark attendance.";
   });
 }
-
-
-
-
-
-// }
