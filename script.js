@@ -86,8 +86,7 @@ function getDistanceFromLatLonInMeters(lat1, lon1, lat2, lon2) {
 
 
 function sendAttendance(name, email, phone, lat, lng) {
-  const scriptURL = 'https://script.google.com/macros/s/AKfycbwqNfX8-oZwuHvhcQL33ZIU-E-5DPkCtJ6z1tZ85haOmVwvF9gHOYnGd7GSK984tSlF/exec';
-
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbwqNfX8-oZwuHvhcQL33ZIU-E-5DPkCtJ6z1tZ85haOmVwvF9gHOYnGd7GSK984tSlF/exec'
   const formData = new FormData();
   formData.append('name', name);
   formData.append('email', email);
@@ -97,18 +96,19 @@ function sendAttendance(name, email, phone, lat, lng) {
 
   fetch(scriptURL, {
     method: 'POST',
-    body: formData,
+    body: formData
   })
   .then(response => response.text())
   .then(result => {
-    console.log("✅ Response from script:", result);
-    status.innerText = "✅ Attendance marked successfully!";
+    console.log("✅ Attendance marked:", result);
+    document.getElementById("status").innerText = "✅ Attendance marked successfully!";
   })
   .catch(error => {
-    console.error("❌ Error sending data:", error);
-    status.innerText = "❌ Failed to mark attendance.";
+    console.error("❌ Error:", error);
+    document.getElementById("status").innerText = "❌ Failed to mark attendance.";
   });
 }
+
 
 
 
