@@ -40,13 +40,18 @@ markBtn?.addEventListener('click', () => {
     const lat = position.coords.latitude;
     const lng = position.coords.longitude;
 
-    const distance = getDistanceFromLatLonInMeters(lat, lng, allowedLat, allowedLng);
+    const distance = getDistanceFromLatLonInMeters(lat, lng,allowedLat,allowedLng);
+    console.log(distance);
+    console.log(radiusMeters);
 
     if (distance <= radiusMeters) {
       status.innerText = "✅ Inside location. Marking attendance...";
       sendAttendance(user.name, user.email, user.phone, lat, lng);
+      console.log("yhanpaunch gye");
     } else {
-      status.innerText = "❌ You are not within the allowed area.";
+        console.log("yhan bhi paunch gye");
+      status.innerText = "❌❌ You are not within the allowed area.";
+      
     }
   }
 });
@@ -82,24 +87,29 @@ function getDistanceFromLatLonInMeters(lat1, lon1, lat2, lon2) {
 
 function sendAttendance(name, email, phone, lat, lng) {
   const scriptURL = 'https://script.google.com/macros/s/AKfycbwqNfX8-oZwuHvhcQL33ZIU-E-5DPkCtJ6z1tZ85haOmVwvF9gHOYnGd7GSK984tSlF/exec';
-  
+
+  const formData = new FormData();
+  formData.append('name', name);
+  formData.append('email', email);
+  formData.append('phone', phone);
+  formData.append('lat', lat);
+  formData.append('lng', lng);
+
   fetch(scriptURL, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ name, email, phone, lat, lng }),
+    body: formData,
   })
   .then(response => response.text())
   .then(result => {
-    console.log("Response from script:", result);
+    console.log("✅ Response from script:", result);
     status.innerText = "✅ Attendance marked successfully!";
   })
   .catch(error => {
-    console.error("Error sending data:", error);
+    console.error("❌ Error sending data:", error);
     status.innerText = "❌ Failed to mark attendance.";
   });
 }
+
 
 
 
